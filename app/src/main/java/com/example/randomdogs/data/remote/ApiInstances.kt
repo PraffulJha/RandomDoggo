@@ -6,6 +6,6 @@ import retrofit2.http.GET
 
 interface ApiInstances {
 
-    @GET("image/random")
+    @GET("breeds/image/random")
     fun generateRandomImages() : Call<ServerResponseGeneratedImage>
 }

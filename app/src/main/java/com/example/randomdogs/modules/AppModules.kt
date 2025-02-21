@@ -4,12 +4,15 @@ import android.content.Context
 import androidx.room.Room
 import com.example.randomdogs.data.remote.ApiInstances
 import com.example.randomdogs.data.repository.GeneratedImageRepository
+import com.example.randomdogs.data.repository.RandomDogsDbRepository
 import com.example.randomdogs.data.repository.repoImpl.GeneratedImageRepoImpl
+import com.example.randomdogs.data.repository.repoImpl.RandomDogsDbRepoImpl
 import com.example.randomdogs.database.GenerateImgDatabase
 import com.example.randomdogs.database.dao.GeneratedImageDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -23,7 +26,7 @@ object AppModules {
     @Singleton
     fun provideApiInstance() : ApiInstances {
         val retrofitInstance = Retrofit.Builder()
-            .baseUrl("https://dog.ceo/api/breeds/")
+            .baseUrl("https://dog.ceo/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
         return retrofitInstance.create(ApiInstances::class.java)
@@ -36,7 +39,7 @@ object AppModules {
 
     @Provides
     @Singleton
-    fun provideDatabase(context: Context): GenerateImgDatabase {
+    fun provideDatabase(@ApplicationContext context: Context): GenerateImgDatabase {
         return Room.databaseBuilder(
             context.applicationContext,
             GenerateImgDatabase::class.java,
@@ -45,9 +48,15 @@ object AppModules {
     }
 
     @Provides
+    @Singleton
     fun provideUserDao(database: GenerateImgDatabase): GeneratedImageDao {
         return database.geneatedImageDao()
     }
 
+    @Provides
+    @Singleton
+    fun providesRandomDogsRepository(generatedImageDao: GeneratedImageDao) : RandomDogsDbRepository {
+        return RandomDogsDbRepoImpl(generatedImageDao)
+    }
 
 }
